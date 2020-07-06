@@ -1,4 +1,4 @@
-# smartcare
+# smartcare-iot
 Este repositório contém o desenvolvimento do projeto SmartCare Environment - Unilasalle-RJ
 
 ## Componentes do projeto
@@ -6,7 +6,7 @@ Este repositório contém o desenvolvimento do projeto SmartCare Environment - U
 ### Raspberry Pi 3 B+
 - Home Assistant [getting-started](https://www.home-assistant.io/getting-started/)
   - SO [hassos_rpi3](https://github.com/home-assistant/operating-system/releases/download/4.11/hassos_rpi3-64-4.11.img.gz)
-  
+
 ### NodeMcu DevKit V3 Esp8266 (Wemos | Lolin)
 - Firmware
   - Tasmota [tasmota.bin](https://github.com/arendst/Tasmota/releases/download/v8.3.1/tasmota-BR.bin)
