@@ -1,8 +1,8 @@
 # smartcare
 Este repositório contém o desenvolvimento do projeto SmartCare Environment - Unilasalle-RJ
 
-# iot-devices
-Lista de componentes do projeto:
+## Componentes do projeto
+
 - Raspberry Pi 3+ B
 - NodeMcu DevKit V3 Esp8266 (Wemos | Lolin)
 - Sensores: 
