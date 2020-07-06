@@ -3,7 +3,7 @@ Este repositório contém o desenvolvimento do projeto SmartCare Environment - U
 
 ## Componentes do projeto
 
-- Raspberry Pi 3+ B
+- Raspberry Pi 3 B+
 - NodeMcu DevKit V3 Esp8266 (Wemos | Lolin)
 - Sensores: 
     - PIR
