@@ -5,11 +5,12 @@
 #include <Ultrasonic.h>
 #include <string.h>
 
+#include <MQTTClient.h>
 // Update these with values suitable for your network.
 
 const char* ssid = "";
 const char* password = "";
-const char* mqtt_server = "";
+const char* mqtt_server = "192.168.0.74";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -30,15 +31,15 @@ void  verificaPresenca();
 #define pinoPIRQuarto 13 // D7 PIR do quarto
 int statusPIRQuarto; //Variavel para guardar valor do sensor do quarto
 
-#define pinoTriggerQuarto 12 // D6
-#define pinoEchoQuarto 14 // D5
+#define pinoTriggerQuarto 14 // D5
+#define pinoEchoQuarto 12 // D6
 Ultrasonic ultrasonic(pinoTriggerQuarto, pinoEchoQuarto);
 int distance;
 
-#define pinoButtonQuarto  5 // D1 BOTAO
+#define pinoButtonQuarto   15 // D8 BOTAO
 #define pinoLedVermelho  4 // D2 LED VERMELHO
-#define pinoLedAmarelo  15 // D8 LED AMARELO
-#define pinoLedQuarto  2 // D4 LED
+#define pinoLedAmarelo  2 // D4 LED AMARELO
+#define pinoLedQuarto  5 // D1 LED BRANCO
 
 void setup_wifi() {
 
@@ -100,7 +101,7 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+  client.setCallback(on_message);
 }
 
 void loop() {
@@ -125,7 +126,7 @@ void publicar(const char* topic, String mensagem, boolean retained)
     client.endPublish();
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void on_message(char* topic, byte* payload, unsigned int length) {
   char msg[length];
   Serial.print("Message arrived [");
   Serial.print(topic);
