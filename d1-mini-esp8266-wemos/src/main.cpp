@@ -14,16 +14,16 @@ const char* mqtt_server = "192.168.0.74";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-String clientId = "Esp8266Wemos-";
-String clientUser = "";
-String clientPass = "";
+String clientId = "D1 mini";
+String clientUser = "smartcare";
+String clientPass = "unilasalle";
 long lastMsg = 0;
 char msg[50];
 int value = 0;
 
 
 void publicar(const char* topic, String mensagem, boolean retained);
-void callback(char* topic, byte* payload, unsigned int length);
+void on_message(char* topic, byte* payload, unsigned int length);
 void verificaIdosoDeitado();
 void  verificaUltrasonico();
 void  verificaPresenca();
@@ -96,9 +96,9 @@ void setup() {
   pinMode(pinoLedQuarto, OUTPUT); //DEFINE O PINO do led COMO SAÍDA
   pinMode(pinoLedVermelho, OUTPUT); //DEFINE O PINO do led COMO SAÍDA
   pinMode(pinoLedAmarelo, OUTPUT); //DEFINE O PINO do led COMO SAÍDA  
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(on_message);
@@ -189,13 +189,13 @@ void on_message(char* topic, byte* payload, unsigned int length) {
 }
 
 void verificaUltrasonico() {  
-  float distancia = ultrasonic.distanceRead('CM'); 
+  float distancia = ultrasonic.read(); 
   Serial.println(distancia);
 
   if (distancia < 20)
   {
     digitalWrite(pinoLedAmarelo, HIGH);
-    client.publish("quarto/porta", "1");
+    client.publish("home/quarto/sensor/UIR-1", "1");
   } else {
     digitalWrite(pinoLedAmarelo, LOW);
   }  
@@ -208,7 +208,7 @@ void verificaIdosoDeitado(){
     Serial.println("O idoso esta deitado");
   } else {
     digitalWrite(pinoLedVermelho, HIGH);
-    client.publish("quarto/cama", "1");
+    client.publish("home/quarto/sensor/BTN-1", "1");
     Serial.println("O idoso nao esta deitado");
   }
 }
@@ -216,9 +216,8 @@ void verificaIdosoDeitado(){
 void verificaPresenca(){
   int sensorVal = digitalRead(pinoPIRQuarto);  
   if (sensorVal == HIGH) {
-    digitalWrite(pinoLedQuarto, HIGH);
-    
-    client.publish("quarto/teto", "1");
+    digitalWrite(pinoLedQuarto, HIGH);    
+    client.publish("home/quarto/sensor/PIR-1", "1");
     //Serial.println("Tem alguem no quarto");
   } else {
     digitalWrite(pinoLedQuarto, LOW);
