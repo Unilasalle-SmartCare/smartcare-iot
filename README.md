@@ -1,7 +1,7 @@
 # smartcare-iot
 
 ### Componentes do projeto
-- Planta de Localização dos Sensores -> [Clique aqui](https://github.com/Unilasalle-SmartCare/smartcare-iot/tree/master/smartcare-environment)
+- Planta de Localização dos Sensores -> [**Clique aqui**](https://github.com/Unilasalle-SmartCare/smartcare-iot/tree/master/smartcare-environment)
 - Raspberry Pi 3 B+ como Servidor Mqtt-Broker
 - Maquina Virtual como C-Mqtt-client
 - D1-mini-lite(Esp8266) como Python-Mqtt-client
