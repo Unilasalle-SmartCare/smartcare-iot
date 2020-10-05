@@ -14,19 +14,18 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 IPAddress ip(10,0,1,20);
 EthernetClient ethClient;
-
 #pragma endregion ethernet
 
-#pragma region wifi
+// #pragma region wifi
 
-const char* ssid = "NET-WIFI-907";
-const char* password = "tekbond793";
-WiFiClient espClient;
+// const char* ssid = "NET-WIFI-907";
+// const char* password = "tekbond793";
+// WiFiClient espClient;
 
-#pragma endregion wifi
+// #pragma endregion wifi
 
 const char* mqtt_server = "192.168.0.74";
-PubSubClient client(espClient);
+PubSubClient client(ethClient);
 
 String clientId = "D1 mini";
 String clientUser = "smartcare";
@@ -42,36 +41,32 @@ void on_message(char* topic, byte* payload, unsigned int length);
 void  verificaUltrasonico();
 void  verificaPresenca();
 
-#define pinoPIRQuarto 13 // D7 PIR do quarto
+
+#define pinoLedAmarelo  2 // LED AMARELO
+#define pinoLedVermelho  3 // LED VERMELHO
+#define pinoLedQuarto  4 // LED VERDE
+#define pinoPIRQuarto 5 // PIR - Sensor de presença
+#define pinoButtonQuarto   6 // BOTAO
+#define pinoTriggerQuarto 7 // Ultrasonic->Trigger - Sensor de distância
+#define pinoEchoQuarto 8 // Ultrasonic->Echo - Sensor de distância
+
+Ultrasonic ultrasonic(pinoTriggerQuarto, pinoEchoQuarto, 30000); // (Trig PIN,Echo PIN)
 int statusPIRQuarto; //Variavel para guardar valor do sensor do quarto
 
-/*HCSR04(trigger, echo, temperature, distance)*/
-
-
-
-#define pinoTriggerQuarto 14 // D5
-#define pinoEchoQuarto 12 // D6
-Ultrasonic ultrasonic(pinoTriggerQuarto, pinoEchoQuarto, 30000); // (Trig PIN,Echo PIN)
-
-//#define pinoButtonQuarto   15 // D8 BOTAO
-#define pinoLedVermelho  4 // D2 LED VERMELHO
-#define pinoLedAmarelo  2 // D4 LED AMARELO
-#define pinoLedQuarto  5 // D1 LED BRANCO
-
-void setup_wifi() {
+void setup_ethernet() {
 
   delay(10);
   // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
-  Serial.println(ssid);
+  Serial.println(Ethernet.gatewayIP());
 
-  WiFi.begin(ssid, password);
+  Ethernet.begin(mac);
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+//   while (Ethernet.status() != WL_CONNECTED) {
+//     delay(500);
+//     Serial.print(".");
+//   }
 
   randomSeed(micros());
 
@@ -116,7 +111,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
 
   Serial.begin(9600);
-  setup_wifi();
+  setup_ethernet();
   client.setServer(mqtt_server, 1883);
   client.setCallback(on_message);
 }

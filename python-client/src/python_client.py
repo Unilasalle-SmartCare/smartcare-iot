@@ -1,8 +1,9 @@
-import paho.mqtt.client as mqtt
-import json
 import base64
-import pyodbc
+import json
+
+import paho.mqtt.client as mqtt
 import pylint
+import pyodbc
 
 #Call back functions 
 
@@ -21,7 +22,7 @@ def on_message(mqttc,obj,msg):
     Topico = str(msg.topic)
     Payload = str(msg.payload)
     x = json.loads(msg.payload)
-    Topic_Handle(Topico, Payload)      
+    Topic_Handle(str(msg.topic), str(msg.payload), str(msg.payload))      
 
 def on_log(mqttc,obj,level,buf):
     print("message:" + str(buf))
@@ -38,7 +39,7 @@ def on_subscribe(mosq, obj, mid, granted_qos):
 
 #===============================================================
 # Database Manager Class
-CONNECTION_STRING = "YourConnectionString"
+CONNECTION_STRING = "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=smartcare_db;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
 
 class DatabaseManager():
 	def __init__(self):
@@ -58,27 +59,28 @@ class DatabaseManager():
 # Function to Handle Data into Database
 
 
-def Topic_Handle(topic, msg):
-    if topic == "home/quarto/+/+/dados":
+def Topic_Handle(topic, value, timestamp):
+    topic_array = topic.split("/")
+    topico = topic_array[2]
+    if topico == "dispositivo":
         device = {}
-        device.IdDispositivo = msg['IdDispositivo']
-        device.IdTipo = msg['IdTipo']
-        device.IdAmbiente = msg['device.IdAmbiente']
-        device.Nome = msg['Nome']
-        device.Descricao = msg['Descricao']
-        device.Eixo_X = msg['Eixo_X']
-        device.Eixo_Y = msg['Eixo_Y'] 
+        device.IdDispositivo = topic_array[2]
+        device.IdTipo = value['IdTipo']
+        device.IdAmbiente = topic_array[1]
+        device.Nome = ''
+        device.Descricao = ''
+        device.Eixo_X = value['Eixo_X']
+        device.Eixo_Y = value['Eixo_Y'] 
 
         Data_Handler(device, "registro")
 
-    elif topic == "home/quarto/+/+/pwr":
+    elif topico == "sensor":
         medicao = {}
-        medicao.IdDispositivo = msg['IdDispositivo']
-        medicao.DataHora = msg['DataHora']
-        medicao.Valor = msg['Valor']
-        medicao.Unidade = msg['Unidade']
+        medicao.IdDispositivo =  topic_array[3]
+        medicao.DataHora = timestamp
+        medicao.Valor = value
 
-        Data_Handler(device, "medicao")  
+        Data_Handler(medicao, "medicao")
 
 def Data_Handler(obj, tipo):		
 	#Push into DB Table
@@ -87,7 +89,7 @@ def Data_Handler(obj, tipo):
             
             #Parse Data 
             IdDispositivo = obj.IdDispositivo
-            IdTipo = obj.IdTipo
+            IdTipo = 2
             IdAmbiente = obj.IdAmbiente
             Nome = obj.Nome
             Descricao = obj.Descricao
@@ -104,7 +106,7 @@ def Data_Handler(obj, tipo):
             IdDispositivo = obj.IdDispositivo
             DataHora = obj.DataHora
             Valor = obj.Valor
-            Unidade = obj.Unidade
+            Unidade = ''
 
             dbObj = DatabaseManager()
             dbObj.add_del_update_db_record("insert into Medicao (IdDispositivo, DataHora, Valor, Unidade) values (?,?,?,?)",[IdDispositivo, DataHora, Valor, Unidade])
@@ -130,7 +132,7 @@ mqttc.on_subscribe=on_subscribe
 mqttc.username_pw_set("luiza","quarto")
 
 # BEWARE, outdated; see tstaging.thethingsnetwork.orghe follow up posts to use eu.thethings.network instead
-mqttc.connect("my_broker",1883,60)
+mqttc.connect(mqttc,"192.168.0.74")
 
 # and listen to server
 run = True
