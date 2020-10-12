@@ -24,4 +24,4 @@ No Unix ou no MacOS, executa:
 `
 source tutorial-env/bin/activate
 `
-refeência: https://docs.python.org/pt-br/3/tutorial/venv.html
+referência: https://docs.python.org/pt-br/3/tutorial/venv.html
