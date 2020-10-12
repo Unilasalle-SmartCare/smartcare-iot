@@ -1,4 +1,4 @@
-# Python client
+# python-mqtt-client
 Cliente desenvolvido para salvar os dados dos sensores no banco de dados.
 
 ## Preparando o ambiente
