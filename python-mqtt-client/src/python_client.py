@@ -84,7 +84,9 @@ def Topic_Handle(topic, value, timestamp):
 
 def Data_Handler(obj, tipo):		
 	#Push into DB Table
+    dbObj = 0
     try:
+        
         if tipo == "registro":
             
             #Parse Data 
@@ -129,10 +131,9 @@ mqttc.on_log=on_log
 mqttc.on_publish=on_publish
 mqttc.on_subscribe=on_subscribe
 
-mqttc.username_pw_set("luiza","quarto")
+mqttc.username_pw_set("smartcare","unilasalle")
 
-# BEWARE, outdated; see tstaging.thethingsnetwork.orghe follow up posts to use eu.thethings.network instead
-mqttc.connect(mqttc,"192.168.0.74")
+mqttc.connect(mqttc,"ec2-18-209-178-192.compute-1.amazonaws.com")
 
 # and listen to server
 run = True
