@@ -1,3 +1,5 @@
 # 
 *.cfg
 *.vscode
+*flasher
+*mqtt-broker
