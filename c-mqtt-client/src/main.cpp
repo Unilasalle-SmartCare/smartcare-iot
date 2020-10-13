@@ -5,7 +5,7 @@
 #include <string.h>
 #include <Ultrasonic.h>
 #include <MQTTClient.h>
-
+#include<ctype.h>
 
 void setup_wifi();
 void reconnect();
@@ -46,8 +46,7 @@ void setup() {
   pinMode(pinoButtonQuarto, INPUT);
   pinMode(pinoLedQuarto, OUTPUT);
   pinMode(pinoLedVermelho, OUTPUT);
-  pinMode(pinoLedAmarelo, OUTPUT);
-  
+  pinMode(pinoLedAmarelo, OUTPUT);  
   
   Serial.begin(9600);
   setup_wifi();
@@ -102,6 +101,8 @@ void reconnect() {
       //client.publish("home/quarto/dispositivo", clientId.c_str());
       // ... and resubscribe
       client.subscribe("home/#");
+      client.subscribe("home/quarto/atuadores/#");
+
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -128,41 +129,38 @@ void on_message(char* topic, byte* payload, unsigned int length)
   Serial.print("[ ");
   Serial.print(topic);
   Serial.print(" ] = ");
-
   for (int i = 0; i < (int)length; i++) {
     msg[i] = (char)payload[i];
     Serial.print((char)payload[i]);
   } 
-  Serial.println(' '); delay(1000);
+  Serial.println(' ');
 
-  // String msgStr(msg);
+  String msgStr(msg);
   // String topicStr(topic);
 
-  if ((strncmp(topic, "home/quarto/sensor/BTN-1", strlen(topic)) == 0) && msg[0] == '1')
+  if ((strncmp(topic, "home/quarto/sensor/BTN-01", strlen(topic)) == 0) && msg[0] == '1')
   {
     Serial.println("Dormindo.");    
     digitalWrite(pinoLedVermelho, HIGH);
   }
-  else if ((strncmp(topic, "home/quarto/sensor/BTN-1", strlen(topic)) == 0) && msg[0] == '0')
+  else if ((strncmp(topic, "home/quarto/sensor/BTN-01", strlen(topic)) == 0) && msg[0] == '0')
   {
     Serial.println("Acordou.");  
     digitalWrite(pinoLedVermelho, LOW);
   }
-  else if ((strncmp(topic, "home/quarto/sensor/UIR-1", strlen(topic)) == 0) && msg[0] == '1')
+  else if ((strncmp(topic, "home/quarto/sensor/UIR-11", strlen(topic)) == 0))
   {    
-    Serial.print("Idoso saiu! ");  Serial.println(msg);
+    Serial.print("Idoso passou à ");  Serial.println(msgStr);
     digitalWrite(pinoLedAmarelo, HIGH);
-  }
-  else if ((strncmp(topic, "home/quarto/sensor/UIR-1", strlen(topic)) == 0) && msg[0] == '0')
-  {
     digitalWrite(pinoLedAmarelo, LOW);
-  }
-  else if ((strncmp(topic, "home/quarto/sensor/PIR-1", strlen(topic)) == 0) && msg[0] == '1')
+        
+  }  
+  else if ((strncmp(topic, "home/quarto/sensor/PIR-01", strlen(topic)) == 0) && msg[0] == '1')
   {
     Serial.println("Tem gente.");
     digitalWrite(pinoLedQuarto, HIGH);
   }
-  else if ((strncmp(topic, "home/quarto/sensor/PIR-1", strlen(topic)) == 0) && msg[0] == '0')
+  else if ((strncmp(topic, "home/quarto/sensor/PIR-01", strlen(topic)) == 0) && msg[0] == '0')
   {
     Serial.println("Ta vazio.");
     digitalWrite(pinoLedQuarto, LOW);
@@ -170,39 +168,30 @@ void on_message(char* topic, byte* payload, unsigned int length)
   else
   {
     Serial.println("Tópico não identificado.");
-    delay(1000);
   }
 }
 
 void verificaPresenca(){
   int sensorVal = digitalRead(pinoPIRQuarto);
   if (sensorVal == HIGH) {      
-    client.publish_P("home/quarto/sensor/PIR-1", "1", true);    
+    client.publish_P("home/quarto/sensor/PIR-01", "1", true);    
   } else {
-    client.publish_P("home/quarto/sensor/PIR-1", "0", true);
+    client.publish_P("home/quarto/sensor/PIR-01", "0", true);
   }
 }
 
 void verificaUltrasonico() {  
   float distancia = ultrasonic.Ranging(CM); 
-  Serial.println(distancia);
-  char _dist[20]  = "";
-  sprintf(_dist, "%f", distancia);  
-   Serial.println(_dist);
-  if (distancia < 30)
-  {
-    client.publish_P("home/quarto/sensor/UIR-1", "1", true);
-  } else {
-    client.publish_P("home/quarto/sensor/UIR-1", "0", true);
-  }  
+  char _dist[5]  = "";
+  sprintf(_dist, "%.f", distancia); 
+  client.publish_P("home/quarto/sensor/UIR-11", _dist, true);
 }
 
 void verificaIdosoDeitado(){
   int sensorVal = digitalRead(pinoButtonQuarto);  
-  delay(300);
   if (sensorVal == HIGH) {    
-    client.publish_P("home/quarto/sensor/BTN-1", "0", true);
+    client.publish_P("home/quarto/sensor/BTN-01", "0", true);
   } else if(sensorVal == LOW){
-    client.publish_P("home/quarto/sensor/BTN-1", "1", true);
+    client.publish_P("home/quarto/sensor/BTN-01", "1", true);
   }
 }
